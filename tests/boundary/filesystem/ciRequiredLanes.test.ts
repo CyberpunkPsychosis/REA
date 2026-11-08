@@ -93,7 +93,7 @@ it("exports every canonical scope with read authority for admission and keeps te
   const timings = z
     .object({
       on: z.object({
-        schedule: z.array(z.object({ cron: z.string() })),
+        schedule: z.undefined().optional(),
         workflow_dispatch: z.unknown(),
         workflow_run: z.unknown().optional(),
       }),
@@ -120,7 +120,7 @@ it("exports every canonical scope with read authority for admission and keeps te
       ),
     );
   expect(timings.on.workflow_run).toBeUndefined();
-  expect(timings.on.schedule).toHaveLength(1);
+  expect(timings.on.schedule).toBeUndefined();
   expect(timings.permissions).toEqual({
     contents: "read",
     actions: "read",
@@ -427,7 +427,7 @@ it("keeps fast feedback separate from complete qualification and release proof",
       on: z.object({
         push: z.unknown(),
         pull_request: z.unknown(),
-        schedule: z.array(z.object({ cron: z.string() })),
+        schedule: z.undefined().optional(),
         workflow_call: z.object({
           inputs: z.object({
             source_sha: z.object({
@@ -473,10 +473,7 @@ it("keeps fast feedback separate from complete qualification and release proof",
         ),
       ),
     );
-  expect(ci.on.schedule).toEqual([
-    { cron: "23 0-2,4-23 * * *" },
-    { cron: "23 3 * * *" },
-  ]);
+  expect(ci.on.schedule).toBeUndefined();
   expect(ci.concurrency.group).toContain("'qualification' || 'feedback'");
   expect(ci.concurrency.group).toContain("inputs.source_sha ||");
   expect(ci.concurrency.group).toContain("github.ref");
